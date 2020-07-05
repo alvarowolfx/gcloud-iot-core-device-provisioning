@@ -1,0 +1,7 @@
+#ifndef OTAUPDATE_H_
+#define OTAUPDATE_H_
+
+#define VERSION VERSION_NUMBER
+#define VERSION_NAME VERSION_HASH
+
+#endif // OTAUPDATE_H_
