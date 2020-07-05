@@ -5,5 +5,6 @@
 
 bool reconnectWiFi();
 void printWifiStatus();
+void networkTask(void *p);
 
 #endif // NETWORK_H_

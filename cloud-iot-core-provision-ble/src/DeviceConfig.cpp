@@ -17,8 +17,7 @@ bool saveConfig()
 
   doc["wifiSsid"] = globalConfig.wifiSsid;
   doc["wifiPass"] = globalConfig.wifiPass;
-  doc["serverHost"] = globalConfig.serverHost;
-  doc["serverPath"] = globalConfig.serverPath;
+  doc["iotCorePrivateKey"] = globalConfig.iotCorePrivateKey;
 
   if (serializeJson(doc, file) == 0)
   {
@@ -61,8 +60,7 @@ bool loadConfig()
 
   strlcpy(globalConfig.wifiSsid, doc["wifiSsid"] | "", sizeof(globalConfig.wifiSsid));
   strlcpy(globalConfig.wifiPass, doc["wifiPass"] | "", sizeof(globalConfig.wifiPass));
-  strlcpy(globalConfig.serverHost, doc["serverHost"] | "", sizeof(globalConfig.serverHost));
-  strlcpy(globalConfig.serverPath, doc["serverPath"] | "", sizeof(globalConfig.serverPath));
+  strlcpy(globalConfig.iotCorePrivateKey, doc["iotCorePrivateKey"] | "", sizeof(globalConfig.iotCorePrivateKey));
 
   file.close();
   return false;

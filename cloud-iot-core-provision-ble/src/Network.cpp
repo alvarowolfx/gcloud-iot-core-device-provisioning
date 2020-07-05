@@ -1,4 +1,5 @@
 #include "Network.h"
+#include "NTP.h"
 #include <WiFi.h>
 
 void printWifiStatus()
@@ -73,4 +74,28 @@ bool reconnectWiFi()
     printWifiStatus();
   }
   return error;
+}
+
+void networkTask(void *p)
+{
+  while (1)
+  {
+    bool error = reconnectWiFi();
+    bool online = !error;
+    if (globalState.online != online)
+    {
+      globalState.online = online;
+      if (error)
+      {
+        Serial.println("[wifi] Error connecting to WiFi");
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+      }
+      else
+      {
+        setupNtp();
+        Serial.println("[wifi] Connected to WiFi");
+      }
+    }
+    vTaskDelay(100 / portTICK_PERIOD_MS);
+  }
 }

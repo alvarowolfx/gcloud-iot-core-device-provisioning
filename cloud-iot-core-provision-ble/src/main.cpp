@@ -4,6 +4,7 @@
 #include <rom/rtc.h>
 
 #include "Network.h"
+#include "NTP.h"
 #include "Provisioning.h"
 #include "DeviceConfig.h"
 #include "DeviceState.h"
@@ -50,27 +51,13 @@ void setup()
     startProvisioningServer();
   }
   loadConfig();
+
+  xTaskCreate(networkTask, "network", 4096, NULL, 5, NULL);
+  xTaskCreate(timeTask, "time", 4096, NULL, 4, NULL);
 }
 
 void loop()
 {
-  bool error = reconnectWiFi();
-  bool online = !error;
-  if (globalState.online != online)
-  {
-    globalState.online = online;
-    if (error)
-    {
-      Serial.println("Error connecting to WiFi");
-      delay(1000);
-    }
-    else
-    {
-      Serial.println("Connected to WiFi");
-      delay(100);
-    }
-  }
-
   if (globalState.hasChanges)
   {
     globalState.hasChanges = false;

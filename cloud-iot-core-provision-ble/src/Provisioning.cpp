@@ -53,14 +53,9 @@ class ProvisioningCallbacks : public NimBLECharacteristicCallbacks
         hasConfigChanges = true;
         hasWifiChanges = true;
       }
-      if (doc.containsKey("serverHost"))
+      if (doc.containsKey("iotCorePrivateKey"))
       {
-        strlcpy(globalConfig.serverHost, doc["serverHost"] | "", sizeof(globalConfig.serverHost));
-        hasConfigChanges = true;
-      }
-      if (doc.containsKey("serverPath"))
-      {
-        strlcpy(globalConfig.serverPath, doc["serverPath"] | "", sizeof(globalConfig.serverPath));
+        strlcpy(globalConfig.iotCorePrivateKey, doc["iotCorePrivateKey"] | "", sizeof(globalConfig.iotCorePrivateKey));
         hasConfigChanges = true;
       }
       if (doc.containsKey("power"))
