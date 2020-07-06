@@ -102,6 +102,8 @@ void setupProvisioning()
   pAdvertising->setScanResponse(true);
   pAdvertising->setMinPreferred(0x06); // functions that help with iPhone connections issue
   pAdvertising->setMaxPreferred(0x12);
+
+  globalState.bleSetup = true;
 }
 
 void startProvisioningServer()
@@ -109,13 +111,14 @@ void startProvisioningServer()
   // Start service
   pService->start();
   BLEDevice::startAdvertising();
-  globalState.bleReady = true;
+  globalState.bleRunning = true;
 }
 
 void stopProvisioningServer()
 {
   Serial.println("[BLE] Stop advertising!");
   BLEDevice::stopAdvertising();
+  globalState.bleRunning = false;
 }
 
 void updateBleStatus(String value)

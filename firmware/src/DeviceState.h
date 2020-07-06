@@ -9,13 +9,16 @@ struct DeviceState
   bool connected = false;
 
   // BLE Ready
-  bool bleReady = false;
+  bool bleRunning = false;
+  bool bleSetup = false;
 
   int lampState = 0x0;
   int lampBrightness = 0;
 
   bool hasWifiChanges = false;
   bool hasStateChanges = false;
+
+  unsigned long lastResetButtonTime = 0;
 };
 
 extern DeviceState globalState;

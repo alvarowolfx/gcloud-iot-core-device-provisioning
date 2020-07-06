@@ -82,11 +82,15 @@ void mqttTask(void *p)
     {
       if (globalState.online && !mqttClient->connected())
       {
+        Serial.println("[MQTT] Not Connected, trying to connect to IoT Core...");
+        globalState.connected = false;
         mqtt->mqttConnect();
       }
       bool connected = mqttClient->connected();
       if (globalState.connected != connected)
       {
+        String state = connected ? "connected" : "not connected";
+        Serial.println("[MQTT] Connection state changed : " + state);
         globalState.connected = connected;
       }
       mqtt->loop();
@@ -117,6 +121,8 @@ void setupCloudIoT()
   mqtt = new CloudIoTCoreMqtt(mqttClient, netClient, device);
   mqtt->setUseLts(true);
   mqtt->startMQTT();
+
+  globalState.connected = false;
 
   Serial.println("[MQTT] Client started");
 }

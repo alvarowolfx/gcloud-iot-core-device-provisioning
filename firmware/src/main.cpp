@@ -1,5 +1,6 @@
 
 #include <Arduino.h>
+#include <OneButton.h>
 #include <ArduinoJson.h>
 #include <rom/rtc.h>
 
@@ -17,6 +18,50 @@ RESET_REASON lastResetReason;
 DeviceConfig globalConfig;
 DeviceState globalState;
 
+OneButton resetButton(globalConfig.resetPin, true);
+
+void onResetPressStart()
+{
+  Serial.println("[RESET] Hold Start : " + String(millis()));
+  globalState.lastResetButtonTime = millis();
+}
+
+void onResetPressStop()
+{
+  Serial.println("[RESET] Hold Stop : " + String(millis()));
+  unsigned long diff = millis() - globalState.lastResetButtonTime;
+  int holdTimeSeconds = diff / 1000.0f;
+  Serial.println("[RESET] Hold Time : " + String(holdTimeSeconds) + "s");
+  if (holdTimeSeconds >= 5)
+  {
+    clearConfig();
+    ESP.restart();
+  }
+}
+
+void onResetDoubleClicked()
+{
+  Serial.println("[RESET] Double Clicked : " + String(millis()));
+  if (!globalState.bleRunning)
+  {
+    if (!globalState.bleSetup)
+    {
+      Serial.println("[RESET] Setup Provisioning");
+      setupProvisioning();
+    }
+    Serial.println("[RESET] Start Provisioning");
+    startProvisioningServer();
+  }
+  else
+  {
+    Serial.println("[RESET] Stop Provisioning");
+    stopProvisioningServer();
+    //TODO: Find a way to stop advertising
+    Serial.println("[RESET] Restarting");
+    ESP.restart();
+  }
+}
+
 void setup()
 {
   // Setup reset pin
@@ -28,7 +73,12 @@ void setup()
   Serial.println(VERSION_NAME);
 
   setupConfig();
-  pinMode(globalConfig.resetPin, INPUT_PULLUP);
+  resetButton.attachLongPressStart(onResetPressStart);
+  resetButton.attachLongPressStop(onResetPressStop);
+  resetButton.attachDoubleClick(onResetDoubleClicked);
+
+  globalState.lastResetButtonTime = millis();
+
   pinMode(globalConfig.lightPin, OUTPUT);
   ledcSetup(globalConfig.lightLedcChannel, globalConfig.lightLedcFrequency, 8);
   ledcAttachPin(globalConfig.lightPin, globalConfig.lightLedcChannel);
@@ -36,21 +86,6 @@ void setup()
   Serial.print("[INIT] Device ID: ");
   Serial.println(globalConfig.deviceName);
 
-  if (digitalRead(globalConfig.resetPin) == LOW)
-  {
-    Serial.println("[INIT] Clear Settings...");
-    clearConfig();
-    delay(2000);
-  }
-
-  lastResetReason = rtc_get_reset_reason(0);
-  if (lastResetReason == POWERON_RESET)
-  {
-    Serial.println("[INIT] Setup Provisioning");
-    setupProvisioning();
-    Serial.println("[INIT] Start Provisioning");
-    startProvisioningServer();
-  }
   loadConfig();
 
   xTaskCreate(networkTask, "network", 4096, NULL, 5, NULL);
@@ -73,7 +108,7 @@ void loop()
       ledcWrite(globalConfig.lightLedcChannel, 0);
     }
 
-    if (globalState.bleReady)
+    if (globalState.bleRunning)
     {
       StaticJsonDocument<256> doc;
       doc["id"] = globalConfig.deviceId;
@@ -97,4 +132,5 @@ void loop()
       publishState(output);
     }
   }
+  resetButton.tick();
 }
