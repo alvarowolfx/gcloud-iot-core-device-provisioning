@@ -24,10 +24,12 @@ struct DeviceConfig
   const char *ntpPrimary = "time.google.com";
   const char *ntpSecondary = "pool.ntp.org";
 
-  uint resetPin = 2;
+  uint resetPin = 0;
   uint lightPin = 13;
   uint lightLedcChannel = 0;
   uint lightLedcFrequency = 5000;
+  // Time (seconds) to expire token += 20 minutes for drift
+  uint jwtExpSecs = 60 * 20; // Maximum 24H (3600*24)
 };
 
 extern DeviceConfig globalConfig;

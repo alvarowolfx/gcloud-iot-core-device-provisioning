@@ -1,8 +1,6 @@
 #ifndef DEVICESTATE_H_
 #define DEVICESTATE_H_
 
-#include "DeviceState.h"
-
 struct DeviceState
 {
   // Connected to WiFi
@@ -17,9 +15,12 @@ struct DeviceState
   int lampBrightness = 0;
 
   bool hasWifiChanges = false;
-  bool hasChanges = false;
+  bool hasStateChanges = false;
 };
 
 extern DeviceState globalState;
+
+void updateLampState(bool on);
+void updateLampBrightness(int brightness);
 
 #endif // DEVICESTATE_H_

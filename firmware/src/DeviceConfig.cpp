@@ -9,7 +9,7 @@ bool saveConfig()
   File file = SPIFFS.open(configFilePath, FILE_WRITE);
   if (!file)
   {
-    Serial.println("Failed to create file to be saved");
+    Serial.println("[CONFIG] Failed to create file to be saved");
     return true;
   }
 
@@ -21,7 +21,7 @@ bool saveConfig()
 
   if (serializeJson(doc, file) == 0)
   {
-    Serial.println("Failed to save config to file");
+    Serial.println("[CONFIG] Failed to save config to file");
   }
 
   file.close();
@@ -38,14 +38,14 @@ bool loadConfig()
 {
   if (!SPIFFS.exists(configFilePath))
   {
-    Serial.println("File not found, using default config");
+    Serial.println("[CONFIG] File not found, using default config");
     return true;
   }
 
   File file = SPIFFS.open(configFilePath, FILE_READ);
   if (!file)
   {
-    Serial.println("Failed to open file for reading, using default config");
+    Serial.println("[CONFIG] Failed to open file for reading, using default config");
     return true;
   }
 
@@ -53,7 +53,7 @@ bool loadConfig()
   DeserializationError error = deserializeJson(doc, file);
   if (error)
   {
-    Serial.println("Failed to parse file, using default config");
+    Serial.println("[CONFIG] Failed to parse file, using default config");
     file.close();
     return true;
   }

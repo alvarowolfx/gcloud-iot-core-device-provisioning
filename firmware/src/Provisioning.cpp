@@ -1,5 +1,6 @@
 #include "Provisioning.h"
 #include "DeviceConfig.h"
+#include "IoTCore.h"
 
 #include <NimBLEDevice.h>
 #include <NimBLEServer.h>
@@ -24,21 +25,17 @@ class ProvisioningCallbacks : public NimBLECharacteristicCallbacks
 
     if (value.length() > 0)
     {
-      Serial.println("*********");
-      Serial.print("New value: ");
-      Serial.print(value.c_str());
-      Serial.println();
-      Serial.println("*********");
+      Serial.print("[BLE] New value: ");
+      Serial.println(value.c_str());
       pCharacteristic->setValue(value);
 
       StaticJsonDocument<512> doc;
       DeserializationError error = deserializeJson(doc, value);
       if (error)
       {
-        Serial.println("Failed to parse json");
+        Serial.println("[BLE] Failed to parse json");
         return;
       }
-      bool hasChanges = false;
       bool hasConfigChanges = false;
       bool hasWifiChanges = false;
       if (doc.containsKey("wifiSsid"))
@@ -57,28 +54,21 @@ class ProvisioningCallbacks : public NimBLECharacteristicCallbacks
       {
         strlcpy(globalConfig.iotCorePrivateKey, doc["iotCorePrivateKey"] | "", sizeof(globalConfig.iotCorePrivateKey));
         hasConfigChanges = true;
+        setupCloudIoT();
       }
       if (doc.containsKey("power"))
       {
-        globalState.lampState = doc["power"] | LOW;
-        if (globalState.lampBrightness == 0)
-        {
-          globalState.lampBrightness = 100;
-        }
-        hasChanges = true;
+        bool on = doc["power"] | false;
+        updateLampState(on);
       }
       if (doc.containsKey("brightness"))
       {
-        globalState.lampBrightness = doc["brightness"] | 0;
-        hasChanges = true;
+        int lampBrightness = doc["brightness"] | 0;
+        updateLampBrightness(lampBrightness);
       }
       if (hasConfigChanges)
       {
         saveConfig();
-      }
-      if (hasChanges)
-      {
-        globalState.hasChanges = hasChanges;
       }
       if (hasWifiChanges)
       {
@@ -124,7 +114,7 @@ void startProvisioningServer()
 
 void stopProvisioningServer()
 {
-  Serial.println("Stop advertising!");
+  Serial.println("[BLE] Stop advertising!");
   BLEDevice::stopAdvertising();
 }
 
@@ -135,6 +125,6 @@ void updateBleStatus(String value)
   pTxCharacteristic->notify();
   delay(10);
 
-  Serial.print("Sending response over ble : ");
+  Serial.print("[BLE] Sending response over ble : ");
   Serial.println(value);
 }

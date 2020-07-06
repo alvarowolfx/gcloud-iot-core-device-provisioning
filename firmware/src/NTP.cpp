@@ -46,6 +46,6 @@ void timeTask(void *p)
   while (1)
   {
     Serial.println("[NTP] " + getTimestamp());
-    vTaskDelay(10000 / portTICK_PERIOD_MS);
+    vTaskDelay(30 * 1000 / portTICK_PERIOD_MS);
   }
 }
