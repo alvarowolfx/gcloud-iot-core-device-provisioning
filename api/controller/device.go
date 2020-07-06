@@ -73,7 +73,7 @@ func (dc *DeviceController) CreateDevice(c *fiber.Ctx) {
 
 type SendCommandRequest struct {
 	Power      bool `json:"power,omitempty" form:"power"`
-	Brightness int  `json:"brightness,omitempty" form:"brightness"`
+	Brightness int  `json:"brightness" form:"brightness"`
 }
 
 func (dc *DeviceController) SendCommand(c *fiber.Ctx) {
