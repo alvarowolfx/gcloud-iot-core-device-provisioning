@@ -36,8 +36,11 @@ class ProvisioningCallbacks : public NimBLECharacteristicCallbacks
         Serial.println("[BLE] Failed to parse json");
         return;
       }
+
       bool hasConfigChanges = false;
       bool hasWifiChanges = false;
+      bool hasIoTCoreChanges = false;
+
       if (doc.containsKey("wifiSsid"))
       {
         strlcpy(globalConfig.wifiSsid, doc["wifiSsid"] | "", sizeof(globalConfig.wifiSsid));
@@ -54,8 +57,30 @@ class ProvisioningCallbacks : public NimBLECharacteristicCallbacks
       {
         strlcpy(globalConfig.iotCorePrivateKey, doc["iotCorePrivateKey"] | "", sizeof(globalConfig.iotCorePrivateKey));
         hasConfigChanges = true;
-        setupCloudIoT();
+        hasIoTCoreChanges = true;
       }
+
+      if (doc.containsKey("iotCoreProjectId"))
+      {
+        strlcpy(globalConfig.iotCoreProjectId, doc["iotCoreProjectId"] | "", sizeof(globalConfig.iotCoreProjectId));
+        hasConfigChanges = true;
+        hasIoTCoreChanges = true;
+      }
+
+      if (doc.containsKey("iotCoreRegion"))
+      {
+        strlcpy(globalConfig.iotCoreRegion, doc["iotCoreRegion"] | "", sizeof(globalConfig.iotCoreRegion));
+        hasConfigChanges = true;
+        hasIoTCoreChanges = true;
+      }
+
+      if (doc.containsKey("iotCoreRegistry"))
+      {
+        strlcpy(globalConfig.iotCoreRegistry, doc["iotCoreRegistry"] | "", sizeof(globalConfig.iotCoreRegistry));
+        hasConfigChanges = true;
+        hasIoTCoreChanges = true;
+      }
+
       if (doc.containsKey("power"))
       {
         bool on = doc["power"] | false;
@@ -69,6 +94,10 @@ class ProvisioningCallbacks : public NimBLECharacteristicCallbacks
       if (hasConfigChanges)
       {
         saveConfig();
+      }
+      if (hasIoTCoreChanges)
+      {
+        setupCloudIoT();
       }
       if (hasWifiChanges)
       {

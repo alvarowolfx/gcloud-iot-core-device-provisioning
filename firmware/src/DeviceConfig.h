@@ -14,9 +14,9 @@ struct DeviceConfig
   char wifiPass[50] = "";
 
   char iotCorePrivateKey[100] = "";
-  char iotCoreRegion[50] = "us-central1";
-  char iotCoreRegistry[50] = "arduino-iot-bootcamp";
-  char iotCoreProjectId[50] = "iot-bootcamp-158521";
+  char iotCoreRegion[50] = "";
+  char iotCoreRegistry[50] = "";
+  char iotCoreProjectId[50] = "";
 
   /* Values not save on storage */
   char deviceId[24] = "";

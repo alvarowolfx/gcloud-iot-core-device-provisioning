@@ -21,6 +21,7 @@ String jwt;
 
 void messageReceived(String &topic, String &payload)
 {
+  globalState.connected = true;
   Serial.println("[MQTT] incoming: " + topic + " - " + payload);
 
   if (payload.length() == 0)
@@ -80,11 +81,14 @@ void mqttTask(void *p)
   {
     if (mqtt != NULL && mqttClient != NULL)
     {
+      mqtt->loop();
+      vTaskDelay(10 / portTICK_PERIOD_MS);
+
       if (globalState.online && !mqttClient->connected())
       {
         Serial.println("[MQTT] Not Connected, trying to connect to IoT Core...");
         globalState.connected = false;
-        mqtt->mqttConnect();
+        mqtt->mqttConnectAsync();
       }
       bool connected = mqttClient->connected();
       if (globalState.connected != connected)
@@ -93,7 +97,6 @@ void mqttTask(void *p)
         Serial.println("[MQTT] Connection state changed : " + state);
         globalState.connected = connected;
       }
-      mqtt->loop();
     }
     vTaskDelay(10 / portTICK_PERIOD_MS);
   }
@@ -104,6 +107,24 @@ void setupCloudIoT()
   if (strlen(globalConfig.iotCorePrivateKey) == 0)
   {
     Serial.println("[MQTT] Missing IoT Core Private Key");
+    return;
+  }
+
+  if (strlen(globalConfig.iotCoreProjectId) == 0)
+  {
+    Serial.println("[MQTT] Missing IoT Core Project Id");
+    return;
+  }
+
+  if (strlen(globalConfig.iotCoreRegion) == 0)
+  {
+    Serial.println("[MQTT] Missing IoT Core Region");
+    return;
+  }
+
+  if (strlen(globalConfig.iotCoreRegistry) == 0)
+  {
+    Serial.println("[MQTT] Missing IoT Core Registry Id");
     return;
   }
 
