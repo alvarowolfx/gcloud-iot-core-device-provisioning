@@ -28,9 +28,11 @@ func main() {
 
 	log.Println(port)
 
-	firebaseDB := infrastructure.FirebaseConnect()
-	ciotService, parent := infrastructure.IoTCoreConnect()
-	provisioner := service.NewIoTCoreDeviceProvisioner(ciotService, parent)
+	firebaseApp := infrastructure.FirebaseApp()
+	firebaseAuth := infrastructure.FirebaseAuth(firebaseApp)
+	firebaseDB := infrastructure.FirebaseConnect(firebaseApp)
+	ciotService, parent, projectID, region, registryID := infrastructure.IoTCoreConnect()
+	provisioner := service.NewIoTCoreDeviceProvisioner(ciotService, parent, projectID, region, registryID)
 	deviceControlService := service.NewIoTCoreDeviceControlService(ciotService, parent)
 	deviceRepository := model.NewFirebaseDeviceRepository(firebaseDB)
 	userRepository := model.NewFirebaseUserRepository(firebaseDB)
@@ -47,6 +49,26 @@ func main() {
 		},
 	}
 	app.Use(recover.New(cfg))
+	checkUserMiddleware := func(c *fiber.Ctx) {
+		ctx := c.Context()
+		authHeader := c.Get(fiber.HeaderAuthorization)
+		idToken := ""
+		authScheme := "Bearer:"
+		l := len(authScheme)
+		if len(authHeader) > l+1 && authHeader[:l] == authScheme {
+			idToken = authHeader[l+1:]
+		} else {
+			c.Status(401).JSON(fiber.Map{"message": "Missing or malformed JWT token"})
+			return
+		}
+		token, err := firebaseAuth.VerifyIDToken(ctx, idToken)
+		if err != nil {
+			c.Status(401).JSON(fiber.Map{"message": err.Error()})
+			return
+		}
+		c.Locals("userID", token.UID)
+		c.Next()
+	}
 
 	app.Get("/", func(c *fiber.Ctx) {
 		c.JSON(fiber.Map{
@@ -54,48 +76,15 @@ func main() {
 		})
 	})
 
-	app.Get("/api/devices/:deviceId", deviceController.CheckDeviceById)
-	app.Post("/api/devices/:deviceId", deviceController.CreateDevice)
-	app.Delete("/api/devices/:deviceId", deviceController.DeleteDevice)
-	app.Post("/api/devices/:deviceId/command", deviceController.SendCommand)
-	app.Post("/api/users/:userId/devices/:deviceId", deviceController.AddDeviceToUser)
+	app.Get("/api/devices/:deviceId", checkUserMiddleware, deviceController.CheckDeviceById)
+	app.Post("/api/devices/:deviceId", checkUserMiddleware, deviceController.CreateDevice)
+	app.Delete("/api/devices/:deviceId", checkUserMiddleware, deviceController.DeleteDevice)
+	app.Post("/api/devices/:deviceId/command", checkUserMiddleware, deviceController.SendCommand)
+	app.Post("/api/users/devices/:deviceId", checkUserMiddleware, deviceController.AddDeviceToUser)
 	//app.Get("/api/devices", heroController.GetHeroesRecommendations)
 
 	err = app.Listen(port)
 	if err != nil {
 		log.Fatalf("error initializing app: %v\n", err)
 	}
-	/*
-			publicKey := `-----BEGIN PUBLIC KEY-----
-		MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8XLBISPU19FFENarEzHjIrS8xz6c
-		xsYlIz3GMhQfqRHvT1zJ0nsMK7x3iXnzPORh6wzcax/cb1ZNgvgYOnuz9w==
-		-----END PUBLIC KEY-----`
-			deviceId := "flutter-esp32-mark-one"
-			err = provisioner.CreateDevice(deviceId, publicKey)
-			if err != nil && err != service.ErrDeviceAlreadyExists {
-				log.Fatalf("Error provisioning device: %v", err)
-			}
-
-			cmd := struct {
-				Power      bool `json:"power,omitempty"`
-				Brightness int  `json:"brightness,omitempty"`
-			}{
-				Power:      true,
-				Brightness: 50,
-			}
-
-			data, err := json.Marshal(cmd)
-			if err != nil {
-				log.Fatalf("Failed to encode cmd", err)
-			}
-
-			err = deviceControllerSrv.SendCommand(deviceId, string(data))
-			if err != nil {
-				log.Fatalf("Error sending cmd to device: %v", err)
-			}
-			err = provisioner.DeleteDevice(deviceId)
-			if err != nil {
-				log.Fatalf("Error deleting device: %v", err)
-			}
-	*/
 }

@@ -7,6 +7,7 @@ require (
 	firebase.google.com/go v3.13.0+incompatible
 	github.com/gofiber/cors v0.2.1
 	github.com/gofiber/fiber v1.12.4
+	github.com/gofiber/jwt v0.1.1 // indirect
 	github.com/gofiber/logger v0.2.3
 	github.com/gofiber/recover v0.1.1
 	github.com/joho/godotenv v1.3.0

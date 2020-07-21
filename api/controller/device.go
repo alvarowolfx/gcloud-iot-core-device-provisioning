@@ -67,13 +67,16 @@ func (dc *DeviceController) CreateDevice(c *fiber.Ctx) {
 	}
 
 	c.Status(200).JSON(fiber.Map{
-		"message": fmt.Sprintf("%s created", deviceID),
+		"message":    fmt.Sprintf("%s created", deviceID),
+		"projectId":  dc.deviceProvisioner.GetProjectId(),
+		"registryId": dc.deviceProvisioner.GetRegistryId(),
+		"region":     dc.deviceProvisioner.GetRegion(),
 	})
 }
 
 type SendCommandRequest struct {
-	Power      bool `json:"power,omitempty" form:"power"`
-	Brightness int  `json:"brightness" form:"brightness"`
+	Power      *bool `json:"power,omitempty" form:"power"`
+	Brightness *int  `json:"brightness,omitempty" form:"brightness"`
 }
 
 func (dc *DeviceController) SendCommand(c *fiber.Ctx) {
@@ -103,7 +106,7 @@ func (dc *DeviceController) SendCommand(c *fiber.Ctx) {
 
 func (dc *DeviceController) AddDeviceToUser(c *fiber.Ctx) {
 	deviceID := c.Params("deviceId")
-	userID := c.Params("userId")
+	userID := c.Locals("userID").(string)
 
 	ctx := context.Background()
 	err := dc.userRepository.AddDeviceToUser(ctx, userID, deviceID)

@@ -45,6 +45,8 @@ github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDk
 github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/dgrijalva/jwt-go v3.2.0+incompatible h1:7qlOGliEKZXTDg6OTjfoBKDXWrumCAMpl/TFQ4/5kLM=
+github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/envoyproxy/go-control-plane v0.9.0/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
 github.com/envoyproxy/go-control-plane v0.9.1-0.20191026205805-5f8ba28d4473/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
 github.com/envoyproxy/go-control-plane v0.9.4/go.mod h1:6rpuAdCZL397s3pYoYcLgu1mIlRU8Am5FuJP05cCM98=
@@ -57,6 +59,8 @@ github.com/gofiber/cors v0.2.1/go.mod h1:DFPONAxVvfFEOMoBH4eqcHp6k0aDYY0FhQsSShA
 github.com/gofiber/fiber v1.12.1/go.mod h1:33AHuW8Sgre3E5tOFJJmBe24MXGNg8GnmcNiXEOFgTU=
 github.com/gofiber/fiber v1.12.4 h1:ZF4O4S/fcWzCTM0K9Qo/5RYqsEM1QMut21QVslhU/KE=
 github.com/gofiber/fiber v1.12.4/go.mod h1:e+Ur2pP2rb5xKtiHATgfQpSwBR0z9q8Mar9+XfYxpOY=
+github.com/gofiber/jwt v0.1.1 h1:ypv7pdgSYFJ2AEQhCXG0bvDPvW/fFtqM0ewKWsJaEOM=
+github.com/gofiber/jwt v0.1.1/go.mod h1:RYvVhm2y7tOr4VvNwH1L5z2oX7+ApWIXn6RvF3oUecg=
 github.com/gofiber/logger v0.2.3 h1:JCGtiAmmY3QQ5U8PWAkpIxUId96+N+kfmUNosI/8tQ8=
 github.com/gofiber/logger v0.2.3/go.mod h1:Bd0E/F2w/UT6Ov9VnU5V7EfKKNL5p9uS7Rwp/cGqFqs=
 github.com/gofiber/recover v0.1.1 h1:M/H+ReIHKKHQAyKpuwi4uQh4J2+lCBWUxOX/gBSQ9ZY=

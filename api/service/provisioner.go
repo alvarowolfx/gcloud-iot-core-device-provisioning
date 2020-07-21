@@ -12,6 +12,9 @@ import (
 type DeviceProvisioner interface {
 	CreateDevice(id, publicKey string) error
 	DeleteDevice(id string) error
+	GetProjectId() string
+	GetRegistryId() string
+	GetRegion() string
 }
 
 var (
@@ -21,13 +24,28 @@ var (
 type IoTCoreDeviceProvisioner struct {
 	ciotService *cloudiot.Service
 	parent      string
+	projectID   string
+	region      string
+	registryID  string
 }
 
-func NewIoTCoreDeviceProvisioner(ciotService *cloudiot.Service, parent string) DeviceProvisioner {
+func NewIoTCoreDeviceProvisioner(ciotService *cloudiot.Service, parent, projectID, region, registryID string) DeviceProvisioner {
 	return &IoTCoreDeviceProvisioner{
 		ciotService: ciotService,
 		parent:      parent,
 	}
+}
+
+func (p *IoTCoreDeviceProvisioner) GetProjectId() string {
+	return p.projectID
+}
+
+func (p *IoTCoreDeviceProvisioner) GetRegion() string {
+	return p.region
+}
+
+func (p *IoTCoreDeviceProvisioner) GetRegistryId() string {
+	return p.registryID
 }
 
 func (p *IoTCoreDeviceProvisioner) CreateDevice(id, publicKey string) error {
@@ -54,7 +72,7 @@ func (p *IoTCoreDeviceProvisioner) CreateDevice(id, publicKey string) error {
 			fmt.Println(" already exists")
 			return ErrDeviceAlreadyExists
 		} else {
-			fmt.Println("Failed to create device: %v", gapiErr.Message)
+			fmt.Println("Failed to create device: %s", gapiErr.Message)
 			return errors.New(gapiErr.Message)
 		}
 	}
