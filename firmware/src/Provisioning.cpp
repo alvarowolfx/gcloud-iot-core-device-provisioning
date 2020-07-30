@@ -118,18 +118,14 @@ void setupProvisioning()
       CHARACTERISTIC_UUID_TX,
       NIMBLE_PROPERTY::NOTIFY);
 
-  pTxCharacteristic->createDescriptor("2902");
-
   pRxCharacteristic = pService->createCharacteristic(
       CHARACTERISTIC_UUID_RX,
-      NIMBLE_PROPERTY::WRITE);
+      NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_ENC);
 
   pRxCharacteristic->setCallbacks(new ProvisioningCallbacks());
 
   BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
   pAdvertising->addServiceUUID(SERVICE_UUID);
-  pAdvertising->setScanResponse(true);
-  pAdvertising->setMinPreferred(0x06); // functions that help with iPhone connections issue
   pAdvertising->setMaxPreferred(0x12);
 
   globalState.bleSetup = true;
@@ -147,7 +143,9 @@ void stopProvisioningServer()
 {
   Serial.println("[BLE] Stop advertising!");
   BLEDevice::stopAdvertising();
+  BLEDevice::deinit(true);
   globalState.bleRunning = false;
+  globalState.bleSetup = false;
 }
 
 void updateBleStatus(String value)

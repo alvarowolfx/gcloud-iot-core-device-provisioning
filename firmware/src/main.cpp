@@ -56,9 +56,6 @@ void onResetDoubleClicked()
   {
     Serial.println("[RESET] Stop Provisioning");
     stopProvisioningServer();
-    //TODO: Find a way to stop advertising
-    Serial.println("[RESET] Restarting");
-    ESP.restart();
   }
 }
 
